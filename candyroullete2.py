@@ -260,7 +260,7 @@ class Player():
                     if player_input == i+1:
                         break
                     elif player_input < len(self.items):
-                        return (self.items[i], )
+                        return (self.items[i], False)
             elif "3" in player_input:
                 while True:
                     typewriter_display("Кому вы хотите дать конфету?\n1. Себе\n2. Оппоненту\n0. Вернуться\n")
@@ -287,7 +287,7 @@ class Player():
                                 break
                     elif "0" in player_input:
                         break
-    def get_steal(enemy_items) -> str:
+    def get_steal(self, enemy_items: list[str]) -> str:
         while True:
             typewriter_display("Какой предмет вы желаете украсть:\n")
             for i, n in enumerate(enemy_items):
@@ -361,6 +361,7 @@ class Game_handler():
         global items
         for i in range(amount):
             self.player.items.append(random.choice(items))
+        for i in range(amount):
             self.opponent.items.append(random.choice(items))
     def play(self):
         if self.player_turn:
@@ -539,8 +540,15 @@ class Game_handler():
             typewriter_display(f"Вы проиграли. Последний раунд: {self.round}\n")
             self.end_game()
             self.player_turn = True
-        if len(self.candies) == 0:
+        if len(self.candies) == 0 and self.opponent.lives > 0 and self.player.lives > 0:
             self.candy_gen(2, 8)
+            self.player_turn = True
+        if self.skip_turn_player and self.player_turn:
+            self.skip_turn_player = False
+            self.player_turn = False
+        if self.skip_turn_opp and not self.player_turn:
+            self.skip_turn_opp == False
+            self.player_turn = True
         
 
     def phone_logic(self) -> tuple[int, bool]:
