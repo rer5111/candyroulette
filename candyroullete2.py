@@ -525,9 +525,11 @@ class Game_handler():
             self.round += 1
             typewriter_display(f"Вы победили! Раунд: {self.round}\n")
             self.new_round()
+            self.player_turn = True
         elif self.player.lives == 0:
             typewriter_display(f"Вы проиграли. Последний раунд: {self.round}\n")
             self.end_game()
+            self.player_turn = True
         if len(self.candies) == 0:
             self.candy_gen(2, 8)
         
@@ -735,7 +737,7 @@ while True:
             except:
                 pass    
             if 0 < menu_input < 3:
-                game_handler.new_game(menu_input-1)
+                game_handler.new_game(1)
             elif menu_input == 3:
                 if achievements["normal_this"]:
                     game_handler.new_game(menu_input-1)
