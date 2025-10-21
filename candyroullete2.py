@@ -335,6 +335,15 @@ class Game_handler():
         global game_running, game_end
         game_running = False
         game_end = True
+        if self.round == 4:
+            if self.difficulty == 1:
+                achievements["ez_pz"] = True
+            if self.difficulty == 2:
+                achievements["normal_this"] = True
+            if self.difficulty == 3:
+                achievements["a_true_battle"] = True
+            if self.difficulty == 4:
+                achievements["omg_u_hax0r"] = True
     def candy_gen(self, min: int, max: int):
                 total_candies = random.randint(min, max)
                 self.candies = []
