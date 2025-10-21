@@ -17,13 +17,9 @@ class Opponent():
     
     def play(self, current_candies: list[bool], player_items: list[str], player_jailed: bool, refresh_think = False) -> tuple[str, bool]: # возвращает предмет и/или кому он хочет дать конфету
         if self.difficulty == 0:    # рандомизатор
-            item_choice = []
+            item_choice = ""
             if self.items != []:
-                while self.items != []:
-                    if random.randint(0, 1):
-                        item_choice.append(self.items.pop(self.items.index(random.choice(self.items))))
-                    else:
-                        break
+                item_choice = random.choice[self.items]
             return (item_choice, random.choice([True, False]))
         elif self.difficulty == 1:  # нубик
             if refresh_think:
@@ -445,6 +441,7 @@ class Game_handler():
                         typewriter_display(text[("Чай", False)])
                         stolen = self.player.get_steal(self.opponent.items)
                         self.player.items.append(stolen)
+                        self.player.items.remove("Чай")
                         self.opponent.items.remove(stolen)
         else:
             if self.refresh_ran:
@@ -452,12 +449,11 @@ class Game_handler():
             else:
                 item, enemy = self.opponent.play(self.candies, self.player.items, self.skip_turn_player, True)
                 self.refresh_ran = True
-            print("refresh ran", flush= True)
             if item == "":
                 if enemy:
                     if self.candies[0]:
                         self.player.lives -= 1 + 1*bool(self.double_damage)
-                        typewriter_display(text["sour_opp_player"].format(self.opponent.lives))
+                        typewriter_display(text["sour_opp_player"].format(self.player.lives))
                         self.candies.pop(0)
                         self.player_turn = True
 
@@ -468,7 +464,7 @@ class Game_handler():
                 else:
                     if self.candies[0]:
                         self.opponent.lives -= 1 + 1*bool(self.double_damage)
-                        typewriter_display(text["sour_opp_self"].format(self.player.lives))
+                        typewriter_display(text["sour_opp_self"].format(self.opponent.lives))
                         self.candies.pop(0)
                         self.player_turn = True
                     else:
@@ -522,6 +518,7 @@ class Game_handler():
                         stolen = self.opponent.steal(self.player.items)
                         typewriter_display(text[("Чай", True)].format(stolen))
                         self.opponent.items.append(stolen)
+                        self.opponent.items.remove("Чай")
                         self.player.items.remove(stolen)
     def end_of_action_update(self):
         if self.opponent.lives == 0:
@@ -533,7 +530,6 @@ class Game_handler():
             self.end_game()
         if len(self.candies) == 0:
             self.candy_gen(2, 8)
-        print(len(self.candies), flush = True)
         
 
     def phone_logic(self) -> tuple[int, bool]:
@@ -577,7 +573,6 @@ def save() -> None:
         new_data += str(achievements[i])
         new_data += "\n"
     new_data += str(time_multiplier)
-    print(new_data)
     new_save.writelines(new_data)
 
 def open_menu() -> None:
@@ -723,7 +718,7 @@ while True:
     menu_input = input(">>> ")
     if "1" in menu_input:
         while True:
-            typewriter_display("Выберите сложность противника:", 0.05)
+            typewriter_display("Выберите сложность противника:\n", 0.05)
             typewriter_display("1. Простой\n- Самый простой и непредсказуемый противник. Действует случайно, не имеет стратегии.\n", 0.05)
             typewriter_display("2. Средний\n- Базовый противник. Имеет что-то напоминающее стратегию.\n", 0.05)
             if achievements["normal_this"]:
