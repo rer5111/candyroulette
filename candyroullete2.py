@@ -66,6 +66,7 @@ class Opponent():
                         return ("Усилитель", True)
                 if "Инвертер" in self.items:
                     if self.think_candies[0] == False:
+                        self.think_candies[0] = True
                         return ("Инвертер", True)
                 if "Наручники" in self.items:
                     if self.think_candies[0] and player_jailed == False:
@@ -402,9 +403,9 @@ class Game_handler():
                     ind, sr = self.phone_logic()
                     if ind != -1:
                         if sr:
-                            typewriter_display(f"{i}-ая конфета кислая\n")
+                            typewriter_display(f"{ind}-ая конфета кислая\n")
                         else:
-                            typewriter_display(f"{i}-ая конфета сладкая\n")
+                            typewriter_display(f"{ind}-ая конфета сладкая\n")
                     else:
                         typewriter_display(f"Как неудачно...")
                     self.player.items.remove("Телефон")
@@ -549,6 +550,7 @@ class Game_handler():
         if self.skip_turn_opp and not self.player_turn:
             self.skip_turn_opp == False
             self.player_turn = True
+            print("override!")
         
 
     def phone_logic(self) -> tuple[int, bool]:
@@ -709,7 +711,7 @@ text = {
     ("Инвертер", False): "Вы обращаете конфету инвертером.\n",
     ("Телефон", False): "Вы достаете телефон...\n",
     ("Тестер", False): "Вы тестируете конфету. Она {}.\n",
-    ("Кока-кола", False): "Вы пьете кока-колу и выбрасываете конфету. Она была {}.\n",
+    ("Кока-кола", False): "Вы пьете кока-колу и выбрасываете конфету.\n",
     ("Шоколад", False): "Вы берете плитку шоколада. Ваши жизни: {}\n",
     ("Молоко", False): "Вы пьете молоко...*2* Оно {}. Ваши жизни: {}\n",
     ("Наручники", False): "Вы даете противнику наручники.\n",
