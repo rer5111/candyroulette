@@ -49,7 +49,7 @@ class Opponent():
                 if "Телефон" in self.items:
                     if len(self.think_candies) > 1: 
                         index_phone, sour_phone = game_handler.phone_logic()
-                        self.think_candies[index_phone] = sour_phone
+                        self.think_candies[index_phone-1] = sour_phone
                         return ("Телефон", False)
                 if "Кока-кола" in self.items:
                     if self.sour_total != 0 and self.sweet_total != 0:
@@ -72,7 +72,7 @@ class Opponent():
                     if self.think_candies[0] and player_jailed == False:
                         return("Наручники", True)
             return ("", give_player)
-        elif self.difficulty == 2:  # про
+        elif self.difficulty == 2:  # про (не работает, нужно заменить все интеракции с булами на интеракции с .финками)
             if refresh_think:
                 self.think_candies = []
                 current_candies2 = current_candies
@@ -111,8 +111,8 @@ class Opponent():
                 if "Телефон" in self.items:
                     if len(self.think_candies) > 1: 
                         index_phone, sour_phone = game_handler.phone_logic()
-                        self.think_candies[index_phone].think = sour_phone
-                        self.think_candies[index_phone].sure = True
+                        self.think_candies[index_phone-1].think = sour_phone
+                        self.think_candies[index_phone-1].sure = True
                         return ("Телефон", False)
                 if "Кока-кола" in self.items:
                     if self.think_candies[0].sure == False:
@@ -129,6 +129,7 @@ class Opponent():
                         return ("Усилитель", True)
                 if "Инвертер" in self.items:
                     if self.think_candies[0] == False:
+                        self.think_candies[0] = True
                         return ("Инвертер", False)
                 if "Наручники" in self.items:
                     if self.think_candies[0] and player_jailed == False:
@@ -261,7 +262,7 @@ class Player():
                     if player_input == i+1:
                         break
                     elif player_input < len(self.items):
-                        return (self.items[i], False)
+                        return (self.items[player_input], False)
             elif "3" in player_input:
                 while True:
                     typewriter_display("Кому вы хотите дать конфету?\n1. Себе\n2. Оппоненту\n0. Вернуться\n")
@@ -280,12 +281,12 @@ class Player():
                         open_menu()
                     if "2" in player_input:
                         while True:
-                            typewriter_display("Вы уверены?\n1. Да\n2. Нет.")
+                            typewriter_display("Вы уверены?\n1. Да\n2. Нет.\n")
                             player_input = input(">>> ")
                             if "1" in player_input:
-                                game_handler.end_game
-                            else:
-                                break
+                                print("i try to end")
+                                game_handler.end_game()
+                            return -1
                     elif "0" in player_input:
                         break
     def get_steal(self, enemy_items: list[str]) -> str:
@@ -293,13 +294,13 @@ class Player():
             typewriter_display("Какой предмет вы желаете украсть:\n")
             for i, n in enumerate(enemy_items):
                 typewriter_display(f"{i}. {n}\n")
-                typewriter_display(f"{i+1}. Вернуться\n")
+            typewriter_display(f"{i+1}. Вернуться\n")
             try:
                 player_input = int(input(">>> "))
             except:
                 pass
             if player_input < len(enemy_items):
-                return (enemy_items[i])
+                return (enemy_items[player_input])
 
 class Game_handler():
     def __init__(self):
@@ -366,7 +367,10 @@ class Game_handler():
             self.opponent.items.append(random.choice(items))
     def play(self):
         if self.player_turn:
-            item, enemy = self.player.get_input(self.opponent.lives, self.opponent.items)
+            try:
+                item, enemy = self.player.get_input(self.opponent.lives, self.opponent.items)
+            except:
+                return -1
             if item == "":
                 if enemy:
                     if self.candies[0]:
@@ -407,7 +411,7 @@ class Game_handler():
                         else:
                             typewriter_display(f"{ind}-ая конфета сладкая\n")
                     else:
-                        typewriter_display(f"Как неудачно...")
+                        typewriter_display(f"Как неудачно...\n")
                     self.player.items.remove("Телефон")
                 elif item == "Тестер":
                     if self.candies[0]:
@@ -419,28 +423,28 @@ class Game_handler():
                 elif item == "Кока-кола":
                     typewriter_display(text[("Кока-кола", False)])
                     if self.candies[0]:
-                        typewriter_display("Она была кислой!")
+                        typewriter_display("Она была кислой!\n")
                     else:
-                        typewriter_display("Она была сладкой!")
+                        typewriter_display("Она была сладкой!\n")
                     self.candies.pop(0)
                     self.player.items.remove("Кока-кола")
                 elif item == "Шоколад":
                     if self.player.lives != self.player.max_lives:
                         self.player.lives += 1
-                        typewriter_display(text[("Шоколад", False)]).format(self.player.lives)
+                        typewriter_display(text[("Шоколад", False)].format(self.player.lives))
                         self.player.items.remove("Шоколад")
                     else:
-                        typewriter_display("У вас уже максимальное количество жизней!")
+                        typewriter_display("У вас уже максимальное количество жизней!\n")
                 elif item == "Молоко":
-                    tmp = random.randchoice(["просрочено", "свежее"])
+                    tmp = random.choice(["просрочено", "свежее"])
                     if tmp == "просрочено":
                         self.player.lives -= 1
-                        typewriter_display(text[("Молоко", False)]).format(tmp, self.player.lives)
+                        typewriter_display(text[("Молоко", False)].format(tmp, self.player.lives))
                     else:
                         self.player.lives += 2
                         if self.player.lives > self.player.max_lives:
                             self.player.lives = self.player.max_lives
-                        typewriter_display(text[("Молоко", False)]).format(tmp, self.player.lives)
+                        typewriter_display(text[("Молоко", False)].format(tmp, self.player.lives))
                     self.player.items.remove("Молоко")
                 elif item == "Наручники":
                     if not self.skip_turn_opp:
@@ -543,19 +547,24 @@ class Game_handler():
             self.player_turn = True
         if len(self.candies) == 0 and self.opponent.lives > 0 and self.player.lives > 0:
             self.candy_gen(2, 8)
+            if self.round == 2:
+                self.item_gen(2)
+            elif self.round == 4:
+                self.item_gen(4)
             self.player_turn = True
         if self.skip_turn_player and self.player_turn:
             self.skip_turn_player = False
             self.player_turn = False
+            typewriter_display(text["player_skip"])
         if self.skip_turn_opp and not self.player_turn:
-            self.skip_turn_opp == False
+            self.skip_turn_opp = False
             self.player_turn = True
-            print("override!")
+            typewriter_display(text["opp_skip"])
         
 
     def phone_logic(self) -> tuple[int, bool]:
         if len(self.candies) > 1:
-            index = random.choice(range(1, len(self.candies)))+1
+            index = random.choice(range(1, len(self.candies)-1))+1
             sour = self.candies[index-1]
         else:
             index = None
